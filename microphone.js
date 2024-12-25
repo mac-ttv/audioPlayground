@@ -1,8 +1,12 @@
 class Microphone {
     constructor(){
         this.initialized = false;
-        navigator.mediaDevices.getUserMedia({audio: true})
-        .then((stream) => {
+        navigator.mediaDevices.getUserMedia({audio: {
+            deviceId: {
+                exact: "68leK3wFYqs72bXMmMyFhSgHjvAS/LOrzrzaSq1JffM="
+            }
+        }})
+        .then(function (stream){
             this.audioContext = new AudioContext();
             this.microphone = this.audioContext.createMediaStreamSource(stream);
             this.analyzer = this.audioContext.createAnalyser();
@@ -11,13 +15,14 @@ class Microphone {
             this.dataArray = new Uint8Array(bufferLength);
             this.microphone.connect(this.analyzer);
             this.initialized = true;
-        }).bind(this).catch((err) => {
+        }.bind(this)).catch((err) => {
             alert(err);
         });
     }
     getSamples(){
         this.analyzer.getByteTimeDomainData(this.dataArray);
         let normSamples = [...this.dataArray].map(e => e/128 - 1);
+        return normSamples;
     }
     getVolume(){
         this.analyzer.getByteTimeDomainData(this.dataArray);
